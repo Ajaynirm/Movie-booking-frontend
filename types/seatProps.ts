@@ -1,6 +1,6 @@
 type seatProps={
     id: number;
     seatLabel: string;
-    isBooked: boolean;
+    booked: boolean;
     isSelected:  boolean;
 }

@@ -42,12 +42,12 @@ export default function ShowDetails() {
               <div
                 key={seat.seatLabel}
                 onClick={() => {
-                  setSelectedSeat(seat);
+                  (!seat.booked? setSelectedSeat(seat):"")
                 }}
               >
                 <Seat
                   id={seat.id}
-                  isBooked={seat.isBooked}
+                  booked={seat.booked}
                   seatLabel={seat.seatLabel}
                   isSelected={selectedSeat?.id === seat.id ? true : false}
                 />
