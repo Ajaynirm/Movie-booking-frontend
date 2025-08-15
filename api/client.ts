@@ -2,11 +2,12 @@
 import axios from "axios"
 
 const apiClient = axios.create({
-  baseURL: "https://movie-booking.zeabur.app",
+  baseURL: "http://localhost:8080",
   headers: {
     "Content-Type": "application/json",
   },
 })
+
 
 // // Optional: Add interceptors for auth tokens
 // apiClient.interceptors.request.use((config) => {
