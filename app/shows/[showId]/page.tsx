@@ -1,13 +1,14 @@
 "use client";
 
-import {use} from "react";
+import { use } from "react";
 import { getShowById } from "@/api/showApi";
 import { Seat } from "@/components/Seat";
 import { useEffect, useState } from "react";
 import { useStore } from "@/store/useStore";
 import DateBox from "@/components/DateBox";
 import { useSocketStore } from "@/store/useSocketStore";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { toast } from "sonner";
 
 
 // app/movies/[id]/page.tsx
@@ -17,6 +18,7 @@ interface PageProps {
 
 
 export default function ShowDetails({params}:PageProps) {
+  const searchParams = useSearchParams();
   const unsubscribeFromShow = useSocketStore((s) => s.unsubscribeFromShow);
   const router = useRouter();
  
@@ -27,17 +29,23 @@ export default function ShowDetails({params}:PageProps) {
   const [loading, setLoading] =useState<boolean>(false);
   const [error,setError]=useState<string>('');
   const [selectedSeat, setSelectedSeat] = useState<seatProps>();
-  const {showId}=use(params);
-  const currShowId = useStore((state) => state.currShowId);
+  const showId=use(params);
+  
+  
 
-
-
+  if(!showId){
+    return<>
+      <div>No show Id to show</div>
+    </>
+  }
+ 
+            
   
   useEffect(() => {
     const fetchShow = async () => {
       try {
         setLoading(true);
-        const data = await getShowById(currShowId);
+        const data = await getShowById(showId.showId);
         setShow(data);
         setSeats(data.showSeats);
       } catch (err) {
@@ -53,23 +61,28 @@ export default function ShowDetails({params}:PageProps) {
 
   useEffect(() => {
     const connectSocket = async ()=>{
-      useSocketStore.getState().connect(showId, (message) => {
-        const updatedSeat = JSON.parse(message.body);
-        console.log("Seat update:", updatedSeat);
+      try{
+        useSocketStore.getState().connect(showId.showId, (message) => {
+          const updatedSeat = JSON.parse(message.body);
+          console.log("Seat update:", updatedSeat);
+      
+          setSeats(prevSeats =>
+            prevSeats.map(seat =>
+              seat.id === updatedSeat.id
+                ? { ...seat, booked: updatedSeat.booked }
+                : seat
+            )
+          );
+        });
+      }catch(err){
+        toast.error("error while connect to Sockets");
+      }
     
-        setSeats(prevSeats =>
-          prevSeats.map(seat =>
-            seat.id === updatedSeat.id
-              ? { ...seat, booked: updatedSeat.booked }
-              : seat
-          )
-        );
-      });
     }
     connectSocket();
-     // ✅ Cleanup properly
+    
   return () => {
-    unsubscribeFromShow(showId);
+    unsubscribeFromShow(showId.showId);
   };
 
   }, [showId]);
@@ -167,7 +180,7 @@ export default function ShowDetails({params}:PageProps) {
         
           <button
             className="bg-rose-400 lg:w-100 text-white font-semibold px-6 py-3 rounded-lg shadow-md transition"
-            onClick={()=>{router.push(`/payment?showId=${currShowId}&userId=${1}&seatLabel=${selectedSeat.seatLabel}`);}}
+            onClick={()=>{router.push(`/confirmation?showId=${showId.showId}&seatLabel=${selectedSeat.seatLabel}`);}}
           >
             Pay RS. 200
           </button>

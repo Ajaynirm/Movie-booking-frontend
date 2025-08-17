@@ -1,8 +1,14 @@
 
 import type { Metadata } from "next";
+import {
+  ClerkProvider,
+
+} from '@clerk/nextjs'
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "@/components/ui/sonner";
 
+import { Header } from "@/components/Header";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,15 +30,21 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  
   return (
+    <ClerkProvider>
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        
+        <header className="flex justify-end items-center p-4 gap-4 h-16">
+          <Header />
+          
+          </header>
         {children}
-        
+        <Toaster position="top-center" expand={false}/>
       </body>
     </html>
+    </ClerkProvider>
   );
 }

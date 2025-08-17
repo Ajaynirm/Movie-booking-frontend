@@ -7,7 +7,7 @@ export const bookSeats = async (showId: number,userId: number, seatLabel: string
 }
 
 export const getUserBookings = async (userId: number) => {
-  const res = await apiClient.get(`/bookings/userId=${userId}`);
+  const res = await apiClient.get(`/booking/user/${userId}`);
   return res.data
 }
 
@@ -15,3 +15,5 @@ export const getBooking = async (id: number ) =>{
   const res = await apiClient.get(`/booking/get-booking?id=${id}`);
  return res.data;
 }
+
+

@@ -1,16 +1,17 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
-import { getBooking } from '@/api/bookingApi';
+import { useEffect, useState } from 'react';
+import { useStore } from '@/store/useStore';
+import { toast } from 'sonner';
+import { getUserBookings } from '@/api/bookingApi';
 
 interface Booking {
   id: number;
   userId: number;
   userName: string;
-  theatreId: number;
+  TheaterId: string;
   theatreName: string;
-  movieName: string;
+  MovieName: string;
   showId: number;
   showTime: string;
   seatLabel: string;
@@ -18,104 +19,72 @@ interface Booking {
   bookingTime: string;
 }
 
-export default function TicketPage() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const [booking, setBooking] = useState<Booking | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const bookingId = searchParams.get('bookingId');
-
+export default function UserBookingsPage() {
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [loading, setLoading] = useState(false);
+  const user = useStore((s) => s.user);
+  
   useEffect(() => {
-    if (!bookingId) return;
-
-    let isMounted = true; // Cleanup flag
-
-    const fetchBooking = async () => {
+    const fetchBooking = async (userId: number) => {
+      
       try {
         setLoading(true);
-        const data = await getBooking(parseInt(bookingId, 10));
-        if (isMounted) setBooking(data);
+        const data = await getUserBookings(userId);
+        setBookings(data);
       } catch (err) {
-        setError('Failed to fetch booking details');
+        toast.error("Error while fetching bookings");
       } finally {
-        if (isMounted) setLoading(false);
+        setLoading(false);
       }
     };
 
-    fetchBooking();
+    if (user?.id) {
+      fetchBooking(user.id);
+    }
+  }, [user?.id]);
 
-    return () => {
-      isMounted = false;
-    };
-  }, [bookingId]);
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen text-lg font-semibold">
-        Loading ticket details...
-      </div>
-    );
+  if (!user?.id) {
+    return <p className="text-center mt-10">Login to see your bookings.</p>;
   }
 
-  if (error || !booking) {
-    return (
-      <div className="flex justify-center items-center h-screen text-red-500">
-        {error || 'No booking found'}
-      </div>
-    );
-  }
+  if (loading) return <p className="text-center mt-10">Loading your bookings...</p>;
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
-      <div className="bg-white shadow-lg rounded-2xl p-6 w-full max-w-md border border-gray-300">
-        <h1 className="text-2xl font-bold text-center mb-4 text-gray-800">
-          🎟️ Booking Confirmed!
-        </h1>
+    <div className="max-w-4xl mx-auto mt-10 p-6">
+      <h1 className="text-2xl font-bold mb-6 text-center">My Bookings</h1>
 
-        <div className="border-t border-b py-4 space-y-2">
-          <p className="text-sm text-gray-500">Ticket ID</p>
-          <p className="text-lg font-semibold">{booking.id}</p>
-
-          <p className="text-sm text-gray-500">Name</p>
-          <p className="text-lg font-semibold">{booking.userName}</p>
-
-          <p className="text-sm text-gray-500">Movie</p>
-          <p className="text-lg font-semibold">{booking.movieName}</p>
-
-          <p className="text-sm text-gray-500">Theatre</p>
-          <p className="text-lg font-semibold">
-            {booking.theatreName} (ID: {booking.theatreId})
-          </p>
-
-          <p className="text-sm text-gray-500">Show Time</p>
-          <p className="text-lg font-semibold">
-            {new Date(booking.showTime).toLocaleString('en-US', {
-              weekday: 'short',
-              day: 'numeric',
-              month: 'short',
-              hour: 'numeric',
-              minute: 'numeric',
-              hour12: true,
-            })}
-          </p>
-
-          <p className="text-sm text-gray-500">Seat</p>
-          <p className="text-lg font-semibold">{booking.seatLabel}</p>
-
-          <p className="text-sm text-gray-500">Price</p>
-          <p className="text-lg font-semibold text-green-600">₹{booking.price}</p>
+      {bookings.length === 0 ? (
+        <p className="text-center text-gray-500">No bookings found.</p>
+      ) : (
+        <div className="grid gap-6">
+          {bookings.map((booking) => (
+            <div
+              key={booking.id}
+              className="bg-white shadow-md rounded-2xl p-5 border hover:shadow-lg transition"
+            >
+              <h2 className="text-xl font-semibold mb-2">{booking.MovieName}</h2>
+              <p className="text-gray-700">
+                Theatre: <span className="font-medium">{booking.theatreName}</span>
+              </p>
+              <p className="text-gray-700">
+                Seat: <span className="font-medium">{booking.seatLabel}</span>
+              </p>
+              <p className="text-gray-700">
+                Show Time:{" "}
+                <span className="font-medium">
+                  {new Date(booking.showTime).toLocaleString()}
+                </span>
+              </p>
+              <p className="text-gray-700">
+                Booked On:{" "}
+                <span className="font-medium">
+                  {new Date(booking.bookingTime).toLocaleString()}
+                </span>
+              </p>
+            </div>
+          ))}
         </div>
-
-        <div className="mt-4 text-center">
-          <button
-            onClick={() => router.push('/')}
-            className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition"
-          >
-            Back to Home
-          </button>
-        </div>
-      </div>
+      )}
     </div>
   );
 }

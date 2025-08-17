@@ -50,32 +50,35 @@ export default function ShowPage() {
   if (shows) {
     return (
       <>
-        <div className="flex flex-col justify-center items-center bg-gray-200 p-10 lg:p-20">
-          <div className="p-10 font-bold text-2xl">shows in chennai </div>
+        <div className="flex flex-col justify-center items-center bg-gray-100 p-10 ">
+          <div className="p-5 font-bold text-xl">Shows </div>
 
           {/* show list for particular location */}
-          <div className="flex flex-col justify-center w-80 gap-2 lg:gap-5 lg:w-320 ">
+          <div className="flex flex-col justify-center items-center  gap-2  w-full ">
             {shows.map((show) => {
               return (
                 <div
                   key={show.id}
-                  className="flex justify-between text-sm    h-25 w-85 lg:w-320 lg:h-50 rounded-sm  bg-white p-10 "
+                  className="flex flex-wrap justify-between md:justify-around lg:justify-between text-sm  w-full     rounded-sm  bg-white p-2 mx-10"
                   onClick={()=>{setCurrShowId(show.id);router.push(`/shows/${show.id}`)}}
                 >
                   <div className="flex flex-col justify-between">
-                    <div className="flex lg:text-2xl font-bold">
+                    <div className="flex lg:text-xl font-bold">
                       <div>{show.theatreName}: </div>
-                      <div>{show.location}</div>
+                      <div className="pl-5">{show.location}</div>
                     </div>
-
+                    
                     <div>{show.movieTitle}</div>
 
-                    <div className="flex justify-center items-center border-2 rounded-sm text-green-600 border-gray-300 lg:h-10 lg:w-30">
+                    <div className="flex justify-center items-center border-2 rounded-sm text-green-600 border-gray-300 ">
+                      <div >
                       {new Date(show.showTime).toLocaleString("en-US", {
                         hour: "numeric",
                         minute: "numeric",
                         hour12: true,
                       })}
+                      </div>
+                     
                     </div>
                   </div>
 
