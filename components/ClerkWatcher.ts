@@ -1,12 +1,13 @@
-'use client'
+"use client";
 
 import { useAuth } from "@clerk/nextjs";
 import { useEffect } from "react";
-import { useStore } from "@/store/useStore";
+import { useSetAtom } from "jotai";
+import { logoutAtom } from "@/store/showStore";
 
 export function ClerkWatcher() {
   const { isSignedIn } = useAuth();
-  const logout = useStore((s) => s.logout);
+  const logout = useSetAtom(logoutAtom);
 
   useEffect(() => {
     if (!isSignedIn) {

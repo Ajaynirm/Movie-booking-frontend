@@ -34,24 +34,24 @@ export default function Search() {
 
   return (
     <>
-      <div className="flex justify-center items-center p-10 space-x-4">
-        <div>
-          <Input
-            type="text"
-            placeholder="Search movies,theater..."
-            size={60}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-        </div>
+      <div className="flex justify-center items-center gap-3 w-full px-3 py-10">
+  {/* Search Input */}
+  <Input
+    type="text"
+    placeholder="Search movies, theater..."
+    className="w-full sm:max-w-md md:max-w-lg lg:max-w-2xl text-sm sm:text-base"
+    onChange={(e) => setQuery(e.target.value)}
+  />
 
-        <div>
-          <X
-            onClick={() => {
-              router.push("/");
-            }}
-          />
-        </div>
-      </div>
+  {/* Close Button */}
+  <button
+    onClick={() => router.push("/")}
+    className="p-2 rounded-sm border-2 "
+  >
+    <X className="w-4 h-4 lg:h-5 lg:w-5" />
+  </button>
+</div>
+
 
         <div className="flex justify-center items-start p-2 lg:w-full lg:h-100 ">
         <div className="flex  flex-col justify-center items-center   lg:gap-2">

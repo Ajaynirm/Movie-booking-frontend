@@ -7,9 +7,9 @@ export const Seat = ({ id, booked, seatLabel, isSelected}: seatProps) => {
       className={`
         flex flex-col items-center justify-center
         p-2 rounded-lg
-        ${booked ? "bg-gray-300 shadow-inner cursor-not-allowed" : "border-2 border-green-500 cursor-pointer"}
+        ${booked ? "bg-gray-500 shadow-inner cursor-not-allowed" : "border-2 border-green-500 cursor-pointer"}
         transition duration-200
-        ${isSelected ? "bg-green-300":""}
+        ${isSelected ? "bg-green-500":""}
       `}
       onClick={() => {
         if (!booked) console.log(booked,seatLabel);

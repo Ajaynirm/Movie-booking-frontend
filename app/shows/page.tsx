@@ -5,16 +5,18 @@ import { getAllShow } from "@/api/showApi";
 import DateBox from "@/components/DateBox";
 import { SkeletonCard } from "@/components/SkeletonCard";
 import { useEffect, useState } from "react";
-import { useStore } from "@/store/useStore";
-
+import { useAtom, useSetAtom } from "jotai";
+import { currShowIdAtom,setCurrShowIdAtom } from "@/store/showStore";
 
 export default function ShowPage() {
-  const currShowId = useStore((state)=> state.currShowId);
-  const setCurrShowId=useStore((state)=>state.setCurrShowId);
+  const [currShowId] = useAtom(currShowIdAtom);
+  const setCurrShowId = useSetAtom(setCurrShowIdAtom);
+
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>();
   const [shows, setShows] = useState<showDetail[]>();
+
   useEffect(() => {
     const fetchShow = async () => {
       try {
@@ -46,11 +48,11 @@ export default function ShowPage() {
       </>
     );
   }
-
+        
   if (shows) {
     return (
       <>
-        <div className="flex flex-col justify-center items-center bg-gray-100 p-10 ">
+        <div className="flex flex-col justify-center items-center  p-10 ">
           <div className="p-5 font-bold text-xl">Shows </div>
 
           {/* show list for particular location */}
@@ -59,26 +61,28 @@ export default function ShowPage() {
               return (
                 <div
                   key={show.id}
-                  className="flex flex-wrap justify-between md:justify-around lg:justify-between text-sm  w-full     rounded-sm  bg-white p-2 mx-10"
-                  onClick={()=>{setCurrShowId(show.id);router.push(`/shows/${show.id}`)}}
+                  className="flex flex-wrap justify-between md:justify-around lg:justify-between text-sm  w-full  border-2 border-gray-600   rounded-sm  p-2 mx-10"
+                  onClick={() => {
+                    setCurrShowId(show.id);
+                    router.push(`/shows/${show.id}`);
+                  }}
                 >
                   <div className="flex flex-col justify-between">
                     <div className="flex lg:text-xl font-bold">
                       <div>{show.theatreName}: </div>
                       <div className="pl-5">{show.location}</div>
                     </div>
-                    
+
                     <div>{show.movieTitle}</div>
 
-                    <div className="flex justify-center items-center border-2 rounded-sm text-green-600 border-gray-300 ">
-                      <div >
-                      {new Date(show.showTime).toLocaleString("en-US", {
-                        hour: "numeric",
-                        minute: "numeric",
-                        hour12: true,
-                      })}
+                    <div className="flex justify-center items-center border-2 rounded-sm text-green-600 ">
+                      <div>
+                        {new Date(show.showTime).toLocaleString("en-US", {
+                          hour: "numeric",
+                          minute: "numeric",
+                          hour12: true,
+                        })}
                       </div>
-                     
                     </div>
                   </div>
 
@@ -102,3 +106,8 @@ export default function ShowPage() {
     );
   }
 }
+
+
+
+
+

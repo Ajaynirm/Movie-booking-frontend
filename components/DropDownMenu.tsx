@@ -1,75 +1,109 @@
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuPortal,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Menu } from "lucide-react"
+} from "@/components/ui/dropdown-menu";
+import {
+  SignUpButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from '@clerk/nextjs'
+import { useAtom } from "jotai";
+import { userAtom } from "@/store/showStore";
+import { Menu } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useClerk } from "@clerk/nextjs";
+import { toast } from "sonner";
 
 export function DropdownMenuDemo() {
+  const [user] = useAtom(userAtom);
+  const router = useRouter();
+  const { signOut } = useClerk();
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline"><Menu /></Button>
+        <Button variant="outline">
+          <Menu />
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="start">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            Profile
-            <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+          <DropdownMenuItem>Profile
+          <DropdownMenuShortcut><SignedIn>
+            <UserButton afterSignOutUrl="/" />
+          </SignedIn></DropdownMenuShortcut>
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            Billing
-            <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
+          <DropdownMenuItem onClick={()=>{router.push("/")}}>
+            Home
+            <DropdownMenuShortcut>⌘H</DropdownMenuShortcut>
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            Settings
+          <DropdownMenuSeparator />
+          
+          <DropdownMenuItem onClick={()=>{router.push("/shows")}}>Show</DropdownMenuItem>
+          <DropdownMenuItem disabled>
+            Movie
             <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            Keyboard shortcuts
+          <DropdownMenuItem disabled>
+            Theatre
             <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
+
+     
         <DropdownMenuGroup>
-          <DropdownMenuItem>Team</DropdownMenuItem>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>Invite users</DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent>
-                <DropdownMenuItem>Email</DropdownMenuItem>
-                <DropdownMenuItem>Message</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>More...</DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-          <DropdownMenuItem>
-            New Team
-            <DropdownMenuShortcut>⌘+T</DropdownMenuShortcut>
+          <DropdownMenuItem  disabled={!user}
+
+            onClick={() => {
+              router.push("/booking");
+            }}
+
+          >
+            View Ticket
           </DropdownMenuItem>
         </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>GitHub</DropdownMenuItem>
-        <DropdownMenuItem>Support</DropdownMenuItem>
-        <DropdownMenuItem disabled>API</DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>
+
+        {user ? 
+        <DropdownMenuItem
+          onSelect={async (e) => {
+            e.preventDefault(); // stop Radix from closing prematurely
+            try {
+              await signOut();
+              toast.success("Logout successfully");
+              setTimeout(() => router.push("/"), 500);
+            } catch (err) {
+              toast.error("Logout Failed");
+            }
+          }}
+          className="text-red-500  cursor-pointer"
+        >
           Log out
-          <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
         </DropdownMenuItem>
+
+          : <DropdownMenuItem
+          onSelect={async (e) => {
+            e.preventDefault(); // stop Radix from closing prematurely
+            try {
+              router.push("/auth/sign-in"); 
+            } catch (err) {
+              toast.error("Redirect Failed");
+            }
+          }}
+          className="text-green-500  cursor-pointer"
+        >
+          Sign In
+        </DropdownMenuItem>}
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }

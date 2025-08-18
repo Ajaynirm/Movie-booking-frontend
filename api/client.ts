@@ -1,12 +1,10 @@
-// src/api/client.ts
-import { useAuth } from "@clerk/nextjs";
 import axios from "axios"
 import Cookies from "js-cookie";
 
 
 
 const apiClient = axios.create({
-  baseURL: "http://localhost:8080",
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
   headers: {
     "Content-Type": "application/json",
   },

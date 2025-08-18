@@ -67,9 +67,9 @@ export default function TicketPage() {
   }
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
-      <div className="bg-white shadow-lg rounded-2xl p-6 w-full max-w-md border border-gray-300">
-        <h1 className="text-2xl font-bold text-center mb-4 text-gray-800">
+    <div className="flex justify-center items-center min-h-screen  p-4">
+      <div className=" shadow-lg rounded-2xl p-6 w-full max-w-md border border-gray-300">
+        <h1 className="text-2xl font-bold text-center mb-4 ">
           🎟️ Booking Confirmed!
         </h1>
 

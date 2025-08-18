@@ -1,35 +1,48 @@
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
+"use client";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 
-
 export const CarouselBox = () => {
-    const img1="https://i.scdn.co/image/ab67616d00001e02ddc2f4d70adb8d92527ac909";
-    const img2="https://m.media-amazon.com/images/M/MV5BNjY5OTg4NTYtZjVkZS00YTZmLWIwNDEtM2Y0ODQyMzM2NTJiXkEyXkFqcGc@._V1_.jpg";
+  const images = [
+    "https://i.ytimg.com/vi/OXHTlMPbX7o/hq720.jpg",
+    "https://img.studioflicks.com/wp-content/uploads/2025/04/22121941/God-Bless-U-Video-Song-Good-Bad-Ugly.jpg",
+    "https://i.ytimg.com/vi/V0rJw2sC2_E/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLC3rFwkAainhzPAZbRORKUQgx4EpQ",
+    "https://i.ytimg.com/vi/TAP53O3uQuo/maxresdefault.jpg",
+  ];
 
+  const [index, setIndex] = useState(0);
 
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIndex((prev) => (prev + 1) % images.length);
+    }, 3000);
+    return () => clearInterval(timer);
+  }, [images.length]);
 
   return (
-    <>
-      <Carousel>
-        <CarouselContent>
-          <CarouselItem><Image src={img1} alt={"poster"} width={300} height={100}/></CarouselItem>
-          <CarouselItem><Image src={img2} alt={"poster"} width={300} height={100}/></CarouselItem>
-          <CarouselItem><Image src={img1} alt={"poster"} width={300} height={100}/></CarouselItem>
-          <CarouselItem><Image src={img2} alt={"poster"} width={300} height={100}/></CarouselItem>
-          <CarouselItem><Image src={img1} alt={"poster"} width={300} height={100}/></CarouselItem>
-        </CarouselContent>
-        <CarouselPrevious />
-        <CarouselNext />
-      </Carousel>
-    </>
+    <div className="relative w-full h-[400px] overflow-hidden">
+      {images.map((src, i) => (
+        <div
+          key={i}
+          className={`absolute inset-0 transition-opacity duration-700 ${
+            i === index ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          <Image src={src} alt={`slide-${i}`} fill className="object-cover" />
+        </div>
+      ))}
+
+      <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-2">
+        {images.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setIndex(i)}
+            className={`btn btn-xs ${i === index ? "btn-primary" : ""}`}
+          >
+            {i + 1}
+          </button>
+        ))}
+      </div>
+    </div>
   );
 };
-
-
-

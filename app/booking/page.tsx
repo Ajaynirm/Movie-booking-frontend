@@ -1,9 +1,11 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useStore } from '@/store/useStore';
-import { toast } from 'sonner';
-import { getUserBookings } from '@/api/bookingApi';
+import { useEffect, useState } from "react";
+import { useAtom } from "jotai";
+import { userAtom } from "@/store/showStore";
+import { toast } from "sonner";
+import { getUserBookings } from "@/api/bookingApi";
+import { useRouter } from "next/navigation";
 
 interface Booking {
   id: number;
@@ -11,7 +13,7 @@ interface Booking {
   userName: string;
   TheaterId: string;
   theatreName: string;
-  MovieName: string;
+  movieName: string;
   showId: number;
   showTime: string;
   seatLabel: string;
@@ -22,14 +24,20 @@ interface Booking {
 export default function UserBookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(false);
-  const user = useStore((s) => s.user);
-  
+  const [user] = useAtom(userAtom);
+  const router=useRouter();
+
   useEffect(() => {
     const fetchBooking = async (userId: number) => {
-      
       try {
         setLoading(true);
-        const data = await getUserBookings(userId);
+        let data = await getUserBookings(userId);
+
+        // Sort: upcoming first (ascending by showTime)
+        data = data.sort(
+          (a: Booking, b: Booking) =>
+            new Date(a.showTime).getTime() - new Date(b.showTime).getTime()
+        );
         setBookings(data);
       } catch (err) {
         toast.error("Error while fetching bookings");
@@ -47,40 +55,61 @@ export default function UserBookingsPage() {
     return <p className="text-center mt-10">Login to see your bookings.</p>;
   }
 
-  if (loading) return <p className="text-center mt-10">Loading your bookings...</p>;
+  if (loading)
+    return <p className="text-center mt-10">Loading your bookings...</p>;
 
   return (
-    <div className="max-w-4xl mx-auto mt-10 p-6">
-      <h1 className="text-2xl font-bold mb-6 text-center">My Bookings</h1>
+    <div className="max-w-6xl mx-auto mt-10 p-6">
+      <h1 className="text-3xl font-bold mb-8 text-center">🎟 My Tickets</h1>
 
       {bookings.length === 0 ? (
-        <p className="text-center text-gray-500">No bookings found.</p>
+        <p className="text-center">No bookings found.</p>
       ) : (
-        <div className="grid gap-6">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {bookings.map((booking) => (
             <div
               key={booking.id}
-              className="bg-white shadow-md rounded-2xl p-5 border hover:shadow-lg transition"
+              className="shadow-lg rounded-2xl overflow-hidden border relative"
+              onClick={()=>{router.push(`/booking/ticket-confirmed?bookingId=${booking.id}`)}}
             >
-              <h2 className="text-xl font-semibold mb-2">{booking.MovieName}</h2>
-              <p className="text-gray-700">
-                Theatre: <span className="font-medium">{booking.theatreName}</span>
-              </p>
-              <p className="text-gray-700">
-                Seat: <span className="font-medium">{booking.seatLabel}</span>
-              </p>
-              <p className="text-gray-700">
-                Show Time:{" "}
-                <span className="font-medium">
-                  {new Date(booking.showTime).toLocaleString()}
-                </span>
-              </p>
-              <p className="text-gray-700">
-                Booked On:{" "}
-                <span className="font-medium">
-                  {new Date(booking.bookingTime).toLocaleString()}
-                </span>
-              </p>
+              {/* Ticket header */}
+              <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white  p-4">
+                <h2 className="text-xl font-bold text-yellow-400">{booking.movieName}</h2>
+                <p className="text-sm opacity-80">
+                  {booking.theatreName}
+                </p>
+              </div>
+
+              {/* Ticket body */}
+              <div className="p-4 relative">
+                <div className="flex justify-between mb-2">
+                  <p className="text-red-400">Seat</p>
+                  <p className="font-semibold text-red-400">{booking.seatLabel}</p>
+                </div>
+
+                <div className="flex justify-between mb-2">
+                  <p className="text-purple-500">Show Time</p>
+                  <p className="font-semibold text-purple-500">
+                    {new Date(booking.showTime).toLocaleString()}
+                  </p>
+                </div>
+
+                <div className="flex justify-between mb-2">
+                  <p className="text-purple-500">Booked On</p>
+                  <p className="font-semibold text-purple-500">
+                    {new Date(booking.bookingTime).toLocaleString()}
+                  </p>
+                </div>
+
+                <div className="flex justify-between border-t pt-2 mt-3">
+                  <p className="text-green-600">Price</p>
+                  <p className="font-semibold">₹{booking.price}</p>
+                </div>
+              </div>
+
+              {/* Ticket cutout effect */}
+              <div className="absolute top-1/2 -left-3 w-6 h-6 bg-gray-600 border rounded-full"></div>
+              <div className="absolute top-1/2 -right-3 w-6 h-6 bg-gray-600 border rounded-full"></div>
             </div>
           ))}
         </div>

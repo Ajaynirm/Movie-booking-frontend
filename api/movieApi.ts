@@ -5,3 +5,7 @@ const res=await apiClient.get(`/movie/add-movie?title=${title}&genre=${genre}&du
 return res.data;
 }
 
+export const getAllMovies = async ()=>{
+    const res=await apiClient.get(`/movie/get-all-movie`);
+    return res.data;
+}

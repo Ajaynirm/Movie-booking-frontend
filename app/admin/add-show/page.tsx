@@ -48,10 +48,10 @@ export default function AddShowPage() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+    <div className="flex justify-center items-center min-h-screen ">
       <form
         onSubmit={handleSubmit}
-        className="bg-white shadow-lg rounded-2xl p-6 w-full max-w-md"
+        className=" shadow-lg rounded-2xl p-6 w-full max-w-md"
       >
         <h1 className="text-2xl font-bold mb-4 text-center">Add New Show</h1>
 

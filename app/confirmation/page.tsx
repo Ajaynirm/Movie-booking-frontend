@@ -1,54 +1,64 @@
 "use client";
 
-import { useStore } from "@/store/useStore";
+import { userAtom, setUserAtom, setCounterAtom } from "@/store/showStore";
+
+import { useAtom,useSetAtom } from "jotai";
+import {
+  DropdownMenuSeparator
+} from "@/components/ui/dropdown-menu"
+
 import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createUser } from "@/api/userApi";
 import { toast } from "sonner";
 import { Alert, AlertTitle } from "@/components/ui/alert";
-import { CheckCircle2Icon } from "lucide-react"
+import { CheckCircle2Icon } from "lucide-react";
 import { getShowDetail } from "@/api/showApi";
 
-interface ShowDetails{
+
+interface ShowDetails {
   id: number;
-    movieTitle:  String;
-    theatreName:  String;
-    location:  String;
-   showTime:  String;
+  movieTitle: String;
+  theatreName: String;
+  location: String;
+  showTime: String;
 }
 
 const Page = () => {
   const searchParams = useSearchParams();
-  const user = useStore((s) => s.user);
+  const [user] = useAtom(userAtom);
+  const setCounter = useSetAtom(setCounterAtom);
+  const setUser = useSetAtom(setUserAtom);
 
-  const setUser = useStore((s) => s.setUser);
   const router = useRouter();
   const [showDetail, setShowDetail] = useState<ShowDetails>();
 
   // const showId = searchParams.get('showId');
   const showId = searchParams.get("showId");
   const seatLabel = searchParams.get("seatLabel");
-  if(!showId){
-    return <>
-    <div>No show Id found</div>
-    </>
+  if (!showId) {
+    return (
+      <>
+        <div>No show Id found</div>
+      </>
+    );
   }
 
-  useEffect(()=>{
-    const getDetail= async(showId:number)=>{
-    try{
-      const data= await getShowDetail(showId);
-     
-      setShowDetail(data);
-    } catch(err){
-      toast.error("error while getting show details")
-    } 
+  useEffect(() => {
+    const getDetail = async (showId: number) => {
+      try {
+        const data = await getShowDetail(showId);
 
-    }
+        setShowDetail(data);
+      } catch (err) {
+        toast.error("error while getting show details");
+      }
+    };
     getDetail(parseInt(showId));
-  },[])
+  }, []);
   const handleToPayment = async () => {
     if (user?.id) {
+      setCounter(60);
       router.push(`/payment?showId=${showId}&seatLabel=${seatLabel}`);
     }
   };
@@ -58,8 +68,8 @@ const Page = () => {
       // create user in backend so that we can track the Booked tickets
       try {
         const data = await createUser(user?.name, user?.email);
+        toast.success(data)
         setUser(data);
-        
       } catch (err) {
         toast.error("Error while Getting User");
       }
@@ -67,23 +77,23 @@ const Page = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center py-10 px-4">
+    <div className="min-h-screen flex flex-col items-center py-10 px-4">
       {/* Header */}
-      <h1 className="text-2xl font-semibold text-gray-800 mb-8">
+      <h1 className="text-2xl font-semibold  mb-8">
         Confirmation Before Payment
       </h1>
 
-      <div className="w-full max-w-5xl bg-white shadow-lg rounded-xl p-6 grid md:grid-cols-2 gap-8">
+      <div className="w-full max-w-5xl shadow-lg rounded-xl p-6 grid md:grid-cols-2 gap-8">
         {/* User Details */}
         <div>
-          <h2 className="text-lg font-medium text-gray-700 mb-4">
+          <h2 className="text-lg font-medium  mb-4">
             User Details
           </h2>
           <div className="space-y-4">
             {/* Name */}
             <div className="flex flex-col">
               <label
-                className="text-sm font-medium text-gray-600 mb-1"
+                className="text-sm font-medium  mb-1"
                 onClick={() => {
                   console.log(user);
                 }}
@@ -105,7 +115,7 @@ const Page = () => {
 
             {/* Email */}
             <div className="flex flex-col">
-              <label className="text-sm font-medium text-gray-600 mb-1">
+              <label className="text-sm font-medium  mb-1">
                 Email
               </label>
               <input
@@ -132,10 +142,9 @@ const Page = () => {
             )}
             {user?.id && (
               <div className="flex justify-center items-center">
-                <Alert >
+                <Alert>
                   <CheckCircle2Icon />
                   <AlertTitle>Account Fetched Success</AlertTitle>
-                 
                 </Alert>
               </div>
             )}
@@ -144,16 +153,22 @@ const Page = () => {
 
         {/* Seat Details */}
         <div>
-          <h2 className="text-lg font-medium text-gray-700 mb-4">
+          <h2 className="text-lg font-medium  mb-4">
             Seat Details
           </h2>
-          <div className="space-y-2 text-gray-600">
-            <div>Show Id: {showId}</div>
-            <div>Theatre: {showDetail?.theatreName}</div>
-            <div>Movie: {showDetail?.movieTitle}</div>
-            <div>Seat: {seatLabel}</div>
-            <div>Show Time: {showDetail?.showTime}</div>
-            <div>Price: {200}</div>
+          <div className="space-y-2 ">
+            <div>Show Id: <span className="pl-30">{showId}</span></div>
+            <DropdownMenuSeparator className="bg-neutral-800 dark:bg-gray-700" />
+            <div>Theatre:  <span className="pl-30">{showDetail?.theatreName}</span></div>
+            <DropdownMenuSeparator className="bg-neutral-800 dark:bg-gray-700"/>
+            <div>Movie:  <span className="pl-33">{showDetail?.movieTitle}</span></div>
+            <DropdownMenuSeparator className="bg-neutral-800 dark:bg-gray-700"/>
+            <div>Seat:  <span className="pl-36">{seatLabel}</span></div>
+            <DropdownMenuSeparator className="bg-neutral-800 dark:bg-gray-700"/>
+            <div>Show Time:  <span className="pl-24">{showDetail?.showTime}</span></div>
+            <DropdownMenuSeparator className="bg-neutral-800 dark:bg-gray-700"/>
+            <div>Price:  <span className="pl-35">{200}</span></div>
+            <DropdownMenuSeparator className="bg-neutral-800 dark:bg-gray-700"/>
           </div>
 
           {/* Payment Button */}
