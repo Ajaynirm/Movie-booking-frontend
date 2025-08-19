@@ -12,6 +12,7 @@ import { Header } from "@/components/Header";
 import { GlobalProvider } from "@/store/GlobalProvider";
 import { usePathname } from "next/navigation";
 import { ThemeProvider } from "@/components/theme-provider"; // ✅ import here
+import { Analytics } from "@vercel/analytics/next"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -49,6 +50,7 @@ export default function RootLayout({
             <GlobalProvider>
               {children}
             </GlobalProvider>
+            <Analytics />
 
             <Toaster position="top-center" expand={false} />
           </ThemeProvider>
