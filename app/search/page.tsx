@@ -27,7 +27,7 @@ export default function Search() {
         const data = await search(query);
         setShow(data);
       } catch (err: any) {
-        toast.error("Error on Searching !....");
+         console.log(err)
       } finally {
         setLoading(false);
       }
@@ -66,8 +66,7 @@ export default function Search() {
       ) : (
         <div className="flex justify-center min-h-screen items-start p-2 lg:w-full ">
           <div className="flex  flex-col justify-center items-center   lg:gap-2">
-            {shows &&
-              shows.length > 0 &&
+            {shows && shows.length > 0 ?
               shows.map((show, ind) => {
                 return (
                   <div
@@ -82,13 +81,8 @@ export default function Search() {
                     <div>{show.location}</div>
                   </div>
                 );
-              })}
-            {shows && shows.length == 0 && query.trim().length == 0 && (
-              <div>Enter Something to Search</div>
-            )}
-            {shows && shows.length == 0 && query.trim().length != 0 && (
-              <div>No shows Found </div>
-            )}
+              }) : (shows?.length==0 && query.trim().length == 0) ? <div>Enter Something to Search</div> : <div>No shows Found </div>}
+           
           </div>
         </div>
       )}

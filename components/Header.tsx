@@ -52,21 +52,19 @@ export const Header = ()=>{
 
         {/* Right: Auth + Menu */}
         <div className="flex items-center gap-4">
-        
-     <ThemeSwitch />
-    
           <ClerkWatcher />
-          {/* <SignedOut>
+
+          <SignedOut>
             <SignUpButton>
-              <button className="bg-[#6c47ff] text-white  font-medium text-sm sm:text-base h-9 sm:h-10 px-4 sm:px-5 cursor-pointer">
-                Sign Up
+              <button className="cursor-pointer">
+                Login
               </button>
             </SignUpButton>
           </SignedOut>
           <SignedIn>
             <UserButton afterSignOutUrl="/" />
-          </SignedIn> */}
-
+          </SignedIn>
+           <ThemeSwitch />
           <DropdownMenuDemo />
 
         </div>

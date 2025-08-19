@@ -7,6 +7,7 @@ import { toast } from "react-hot-toast";
 import { useAtom } from "jotai";
 import { userAtom, counterAtom } from "@/store/showStore";
 import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { AlertDemo } from "@/components/Error";
 
 
 const PaymentPage =async ({
@@ -72,8 +73,8 @@ const PaymentPage =async ({
 
   if (!showId || !user?.id || !seatLabel) {
     return (
-      <div className="flex justify-center items-center h-screen text-red-500">
-        Missing required booking parameters in URL.
+      <div className="flex justify-start md:justify-center items-center min-h-screen">
+        <AlertDemo content={`Missing required booking parameters in URL.`} />
       </div>
     );
   }

@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { getBooking } from '@/api/bookingApi';
 import { SkeletonCard } from '@/components/SkeletonCard';
+import { AlertDemo } from '@/components/Error';
 
 interface Booking {
   id: number;
@@ -67,8 +68,8 @@ const  TicketPage =async ({
 
   if (error || !booking) {
     return (
-      <div className="flex justify-center items-center h-screen text-red-500">
-        {error || 'No booking found'}
+      <div className="flex justify-start md:justify-center items-center min-h-screen ">
+        <AlertDemo content={`'No booking found'`} />
       </div>
     );
   }

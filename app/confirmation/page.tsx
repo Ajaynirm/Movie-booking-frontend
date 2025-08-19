@@ -13,6 +13,7 @@ import { Alert, AlertTitle } from "@/components/ui/alert";
 import { CheckCircle2Icon } from "lucide-react";
 import { getShowDetail } from "@/api/showApi";
 import { SkeletonCard } from "@/components/SkeletonCard";
+import { AlertDemo } from "@/components/Error";
 
 interface ShowDetails {
   id: number;
@@ -40,7 +41,9 @@ const Page = async ({
   if (!showId) {
     return (
       <>
-        <div>No show Id found</div>
+        <div className="flex justify-start md:justify-center  items-center min-h-screen">
+          <AlertDemo content={`No show Id found`} />
+        </div>
       </>
     );
   }

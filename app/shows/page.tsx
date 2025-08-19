@@ -7,6 +7,7 @@ import { SkeletonCard } from "@/components/SkeletonCard";
 import { useEffect, useState } from "react";
 import { useAtom, useSetAtom } from "jotai";
 import { currShowIdAtom,setCurrShowIdAtom } from "@/store/showStore";
+import { AlertDemo } from "@/components/Error";
 
 export default function ShowPage() {
   const [currShowId] = useAtom(currShowIdAtom);
@@ -44,7 +45,11 @@ export default function ShowPage() {
   if (error) {
     return (
       <>
-        <div>{error}</div>
+      <div className="flex justify-start md:justify-center items-center min-h-screen">
+      <div><AlertDemo content={error}/></div>
+
+      </div>
+        
       </>
     );
   }
