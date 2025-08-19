@@ -1,8 +1,10 @@
 'use client';
 
+
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { getBooking } from '@/api/bookingApi';
+import { SkeletonCard } from '@/components/SkeletonCard';
 
 interface Booking {
   id: number;
@@ -18,13 +20,18 @@ interface Booking {
   bookingTime: string;
 }
 
-export default function TicketPage() {
-  const searchParams = useSearchParams();
+const  TicketPage =async ({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string  | undefined }>
+}) =>{
+  
   const router = useRouter();
   const [booking, setBooking] = useState<Booking | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const bookingId = searchParams.get('bookingId');
+  const {bookingId} = await searchParams;
+  
 
   useEffect(() => {
     if (!bookingId) return;
@@ -52,8 +59,8 @@ export default function TicketPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen text-lg font-semibold">
-        Loading ticket details...
+      <div className="flex justify-center items-center min-h-screen ">
+        <SkeletonCard />
       </div>
     );
   }
@@ -119,3 +126,5 @@ export default function TicketPage() {
     </div>
   );
 }
+
+export default TicketPage;

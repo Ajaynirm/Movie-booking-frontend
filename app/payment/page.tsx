@@ -8,15 +8,19 @@ import { useAtom } from "jotai";
 import { userAtom, counterAtom } from "@/store/showStore";
 import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 
-const PaymentPage: React.FC = () => {
-  const searchParams = useSearchParams();
+
+const PaymentPage =async ({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string  | undefined }>
+}) => {
   const router = useRouter();
   const [user] = useAtom(userAtom);
   const [GlobalCounter] = useAtom(counterAtom);
   const [counter, setCounter] = useState<number>(GlobalCounter);
 
-  const showId = searchParams.get("showId");
-  const seatLabel = searchParams.get("seatLabel");
+  const {showId, seatLabel}=await searchParams;
+
 
   const [loading, setLoading] = useState(false);
 
@@ -24,8 +28,10 @@ const PaymentPage: React.FC = () => {
   useEffect(() => {
     if (counter === 0) {
       toast.error("Payment session timed out ⏰");
-      setTimeout(()=>{router.push(`/shows/${showId}`);},3000);
-      
+      setTimeout(() => {
+        router.push(`/shows/${showId}`);
+      }, 3000);
+
       return;
     }
 
@@ -83,7 +89,7 @@ const PaymentPage: React.FC = () => {
         <div>
           <div className="pb-10 flex flex-col justify-center items-center">
             <div>Time Remaining</div>
-            <span className="countdown font-mono text-6xl">
+            <span className="countdown font-mono text-5xl">
               <span
                 style={{ "--value": counter } as React.CSSProperties}
                 aria-live="polite"
@@ -113,9 +119,17 @@ const PaymentPage: React.FC = () => {
           onClick={handleBooking}
           disabled={loading || counter === 0}
           className={`w-full py-2 px-4 rounded font-semibold border-2 cursor-pointer 
-            ${counter === 0 ? "bg-gray-400 cursor-not-allowed" : "bg-gradient-to-r from-blue-600 to-purple-600 text-white"}`}
+            ${
+              counter === 0
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+            }`}
         >
-          {loading ? "Processing..." : counter === 0 ? "Timeout" : "Pay through Yeppo"}
+          {loading
+            ? "Processing..."
+            : counter === 0
+            ? "Timeout"
+            : "Pay through Yeppo"}
         </button>
       </div>
     </div>

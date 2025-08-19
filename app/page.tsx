@@ -4,14 +4,9 @@ import { CarouselBox } from "@/components/Carousel";
 import { Footer } from "@/components/Footer";
 import { Inter } from "next/font/google";
 import { useEffect, useState } from "react";
-import Cookies from "js-cookie";
-import { getUserFromToken } from "@/api/userApi";
-import { useAuth } from "@clerk/nextjs";
-import { toast } from "sonner";
-import { useSetAtom } from "jotai";
-import { setUserAtom } from "@/store/showStore";
 import { getAllMovies } from "@/api/movieApi";
 import { useRouter } from "next/navigation";
+import { SkeletonCard } from "@/components/SkeletonCard";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -25,41 +20,22 @@ interface Movie{
 }
 
 export default function Home() {
-  const setUser = useSetAtom(setUserAtom);
-  const { getToken } = useAuth();
   const [movies, setMovies] =useState<Movie[]>([]);
   const router = useRouter();
-
-
-  useEffect(() => {
-    const fetchJwt = async () => {
-      try {
-        const token = await getToken({ template: "movie-jwt" });
-        if (!token) return;
-        Cookies.set("auth_token", token, { expires: 1 });
-        const data = await getUserFromToken(token);
-        toast.success("Success from backend auth", data);
-        setUser({
-          name: data.name,
-          id: parseInt(data.id),
-          email: data.email,
-        });
-      } catch (err) {
-        toast.error("Error doing login");
-      }
-    };
-
-    fetchJwt();
-  }, []);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(()=>{
     const fetchMovies = async ()=>{
       try{
+        setLoading(true);
         const data=await getAllMovies();
         setMovies(data);
       }catch{
         console.log("Movie fetching failed");
+      }finally{
+        setLoading(false);
       }
+
     }
     fetchMovies();
   },[]);
@@ -96,7 +72,10 @@ export default function Home() {
           >
             Recommended Shows
           </h2>
-          
+
+          {loading ? <div className="flex justify-around items-center py-10">
+            <SkeletonCard /> <SkeletonCard /> <SkeletonCard /> 
+            </div>: 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
   {movies.map((movie, ind) => (
     <div
@@ -136,6 +115,7 @@ export default function Home() {
     </div>
   ))}
 </div>
+}
 
         </section>
       </main>

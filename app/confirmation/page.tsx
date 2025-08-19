@@ -2,10 +2,8 @@
 
 import { userAtom, setUserAtom, setCounterAtom } from "@/store/showStore";
 
-import { useAtom,useSetAtom } from "jotai";
-import {
-  DropdownMenuSeparator
-} from "@/components/ui/dropdown-menu"
+import { useAtom, useSetAtom } from "jotai";
+import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 
 import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -14,7 +12,7 @@ import { toast } from "sonner";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import { CheckCircle2Icon } from "lucide-react";
 import { getShowDetail } from "@/api/showApi";
-
+import { SkeletonCard } from "@/components/SkeletonCard";
 
 interface ShowDetails {
   id: number;
@@ -24,18 +22,21 @@ interface ShowDetails {
   showTime: String;
 }
 
-const Page = () => {
-  const searchParams = useSearchParams();
+const Page = async ({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | undefined }>;
+}) => {
   const [user] = useAtom(userAtom);
   const setCounter = useSetAtom(setCounterAtom);
   const setUser = useSetAtom(setUserAtom);
-
   const router = useRouter();
   const [showDetail, setShowDetail] = useState<ShowDetails>();
+  const [loading, setLoading] = useState<boolean>(false);
 
   // const showId = searchParams.get('showId');
-  const showId = searchParams.get("showId");
-  const seatLabel = searchParams.get("seatLabel");
+  const { showId, seatLabel } = await searchParams;
+
   if (!showId) {
     return (
       <>
@@ -47,15 +48,19 @@ const Page = () => {
   useEffect(() => {
     const getDetail = async (showId: number) => {
       try {
+        setLoading(true);
         const data = await getShowDetail(showId);
 
         setShowDetail(data);
       } catch (err) {
         toast.error("error while getting show details");
+      } finally {
+        setLoading(false);
       }
     };
     getDetail(parseInt(showId));
   }, []);
+
   const handleToPayment = async () => {
     if (user?.id) {
       setCounter(60);
@@ -68,13 +73,23 @@ const Page = () => {
       // create user in backend so that we can track the Booked tickets
       try {
         const data = await createUser(user?.name, user?.email);
-        toast.success(data)
+        toast.success(data);
         setUser(data);
       } catch (err) {
         toast.error("Error while Getting User");
       }
     }
   };
+
+  if (loading) {
+    return (
+      <>
+        <div className="flex justify-center items-center py-10 min-h-screen">
+          <SkeletonCard />
+        </div>
+      </>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center py-10 px-4">
@@ -86,9 +101,7 @@ const Page = () => {
       <div className="w-full max-w-5xl shadow-lg rounded-xl p-6 grid md:grid-cols-2 gap-8">
         {/* User Details */}
         <div>
-          <h2 className="text-lg font-medium  mb-4">
-            User Details
-          </h2>
+          <h2 className="text-lg font-medium  mb-4">User Details</h2>
           <div className="space-y-4">
             {/* Name */}
             <div className="flex flex-col">
@@ -115,9 +128,7 @@ const Page = () => {
 
             {/* Email */}
             <div className="flex flex-col">
-              <label className="text-sm font-medium  mb-1">
-                Email
-              </label>
+              <label className="text-sm font-medium  mb-1">Email</label>
               <input
                 type="email"
                 className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring focus:ring-indigo-200"
@@ -153,22 +164,32 @@ const Page = () => {
 
         {/* Seat Details */}
         <div>
-          <h2 className="text-lg font-medium  mb-4">
-            Seat Details
-          </h2>
+          <h2 className="text-lg font-medium  mb-4">Seat Details</h2>
           <div className="space-y-2 ">
-            <div>Show Id: <span className="pl-30">{showId}</span></div>
+            <div>
+              Show Id: <span className="pl-30">{showId}</span>
+            </div>
             <DropdownMenuSeparator className="bg-neutral-800 dark:bg-gray-700" />
-            <div>Theatre:  <span className="pl-30">{showDetail?.theatreName}</span></div>
-            <DropdownMenuSeparator className="bg-neutral-800 dark:bg-gray-700"/>
-            <div>Movie:  <span className="pl-33">{showDetail?.movieTitle}</span></div>
-            <DropdownMenuSeparator className="bg-neutral-800 dark:bg-gray-700"/>
-            <div>Seat:  <span className="pl-36">{seatLabel}</span></div>
-            <DropdownMenuSeparator className="bg-neutral-800 dark:bg-gray-700"/>
-            <div>Show Time:  <span className="pl-24">{showDetail?.showTime}</span></div>
-            <DropdownMenuSeparator className="bg-neutral-800 dark:bg-gray-700"/>
-            <div>Price:  <span className="pl-35">{200}</span></div>
-            <DropdownMenuSeparator className="bg-neutral-800 dark:bg-gray-700"/>
+            <div>
+              Theatre: <span className="pl-30">{showDetail?.theatreName}</span>
+            </div>
+            <DropdownMenuSeparator className="bg-neutral-800 dark:bg-gray-700" />
+            <div>
+              Movie: <span className="pl-33">{showDetail?.movieTitle}</span>
+            </div>
+            <DropdownMenuSeparator className="bg-neutral-800 dark:bg-gray-700" />
+            <div>
+              Seat: <span className="pl-36">{seatLabel}</span>
+            </div>
+            <DropdownMenuSeparator className="bg-neutral-800 dark:bg-gray-700" />
+            <div>
+              Show Time: <span className="pl-24">{showDetail?.showTime}</span>
+            </div>
+            <DropdownMenuSeparator className="bg-neutral-800 dark:bg-gray-700" />
+            <div>
+              Price: <span className="pl-35">{200}</span>
+            </div>
+            <DropdownMenuSeparator className="bg-neutral-800 dark:bg-gray-700" />
           </div>
 
           {/* Payment Button */}

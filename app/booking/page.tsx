@@ -21,7 +21,7 @@ interface Booking {
   bookingTime: string;
 }
 
-export default function UserBookingsPage() {
+ const  UserBookingsPage = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(false);
   const [user] = useAtom(userAtom);
@@ -117,3 +117,5 @@ export default function UserBookingsPage() {
     </div>
   );
 }
+
+export default UserBookingsPage;

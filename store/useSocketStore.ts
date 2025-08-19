@@ -16,7 +16,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 
   connect: (showId, callback) => {
     const client = new Client({
-      webSocketFactory: () => new SockJS("http://localhost:8080/ws"),
+      webSocketFactory: () => new SockJS(`${process.env.NEXT_PUBLIC_API_URL}/ws`),
       reconnectDelay: 5000,
       onConnect: () => {
         console.log("Connected to WebSocket");

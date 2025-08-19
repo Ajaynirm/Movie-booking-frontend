@@ -18,7 +18,6 @@ export function GlobalProvider({ children }: { children: ReactNode }) {
         if (!token) return;
         Cookies.set("auth_token", token, { expires: 1 });
         const data = await getUserFromToken(token);
-        toast.success("Success from backend auth", data);
         setUser({
           name: data.name,
           id: parseInt(data.id),
