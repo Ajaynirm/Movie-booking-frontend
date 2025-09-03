@@ -23,28 +23,24 @@ interface ShowDetails {
   showTime: String;
 }
 
-const Page = async ({
-  searchParams,
-}: {
-  searchParams: Promise<{ [key: string]: string | undefined }>;
-}) => {
+const Page = () => {
   const [user] = useAtom(userAtom);
   const setCounter = useSetAtom(setCounterAtom);
   const setUser = useSetAtom(setUserAtom);
   const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [showDetail, setShowDetail] = useState<ShowDetails>();
   const [loading, setLoading] = useState<boolean>(false);
 
-  // const showId = searchParams.get('showId');
-  const { showId, seatLabel } = await searchParams;
+  const showId = searchParams.get("showId");
+  const seatLabel = searchParams.get("seatLabel");
 
   if (!showId) {
     return (
-      <>
-        <div className="flex justify-start md:justify-center  items-center min-h-screen">
-          <AlertDemo content={`No show Id found`} />
-        </div>
-      </>
+      <div className="flex justify-start md:justify-center items-center min-h-screen">
+        <AlertDemo content={`No show Id found`} />
+      </div>
     );
   }
 
@@ -53,7 +49,6 @@ const Page = async ({
       try {
         setLoading(true);
         const data = await getShowDetail(showId);
-
         setShowDetail(data);
       } catch (err) {
         toast.error("error while getting show details");
@@ -62,7 +57,7 @@ const Page = async ({
       }
     };
     getDetail(parseInt(showId));
-  }, []);
+  }, [showId]);
 
   const handleToPayment = async () => {
     if (user?.id) {
@@ -76,7 +71,7 @@ const Page = async ({
       // create user in backend so that we can track the Booked tickets
       try {
         const data = await createUser(user?.name, user?.email);
-        toast.success(data);
+        toast.success("Email stored in Backend");
         setUser(data);
       } catch (err) {
         toast.error("Error while Getting User");

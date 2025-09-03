@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useCallback, useEffect } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import React, { useState, useEffect, use } from "react";
+import { useRouter } from "next/navigation";
 import { bookSeats } from "@/api/bookingApi";
 import { toast } from "react-hot-toast";
 import { useAtom } from "jotai";
@@ -9,19 +9,18 @@ import { userAtom, counterAtom } from "@/store/showStore";
 import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { AlertDemo } from "@/components/Error";
 
-
-const PaymentPage =async ({
+const PaymentPage = ({
   searchParams,
 }: {
-  searchParams: Promise<{ [key: string]: string  | undefined }>
+  searchParams: { [key: string]: string | undefined };
 }) => {
   const router = useRouter();
   const [user] = useAtom(userAtom);
   const [GlobalCounter] = useAtom(counterAtom);
   const [counter, setCounter] = useState<number>(GlobalCounter);
 
-  const {showId, seatLabel}=await searchParams;
-
+  // ✅ unwrap searchParams with React.use()
+  const { showId, seatLabel } = React.use(searchParams);
 
   const [loading, setLoading] = useState(false);
 
@@ -41,9 +40,9 @@ const PaymentPage =async ({
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [counter]);
+  }, [counter, router, showId]);
 
-  const handleBooking = useCallback(async () => {
+  const handleBooking = async () => {
     if (!showId || !user?.id || !seatLabel) {
       toast.error("Missing booking details.");
       return;
@@ -59,9 +58,6 @@ const PaymentPage =async ({
       const res = await bookSeats(parseInt(showId, 10), user.id, seatLabel);
 
       toast.success("Booking successful!");
-      console.log("Booking Response:", res);
-
-      // Redirect to booking confirmation page
       router.push(`/booking/ticket-confirmed?bookingId=${res.id}`);
     } catch (err) {
       console.error(err);
@@ -69,7 +65,7 @@ const PaymentPage =async ({
     } finally {
       setLoading(false);
     }
-  }, [showId, user?.id, seatLabel, router, counter]);
+  };
 
   if (!showId || !user?.id || !seatLabel) {
     return (

@@ -1,16 +1,32 @@
 "use client";
 import { ReactNode, useEffect } from "react";
 import { useSetAtom } from "jotai";
-import { userAtom } from "@/store/showStore";
+import { setUserAtom} from "@/store/showStore";
 import { getUserFromToken } from "@/api/userApi";
 import { useAuth } from "@clerk/nextjs";
 import Cookies from "js-cookie";
-import { toast } from "sonner";
+import { checkAuth } from "@/api/auth";
 
 export function GlobalProvider({ children }: { children: ReactNode }) {
-  const setUser = useSetAtom(userAtom);
+ 
+  const setUser = useSetAtom(setUserAtom);
   const { getToken } = useAuth();
+ useEffect(()=>{
+    const checkuser=async()=>{
+      try{
+        const data=await checkAuth();
+        console.log(data)
+        setUser({
+          name: data.name,
+          id: parseInt(data.id),
+          email: data.email,
+        });
+      }catch(err){
 
+      }
+    }
+    checkuser();
+ },[])
   useEffect(() => {
     const fetchJwt = async () => {
       try {

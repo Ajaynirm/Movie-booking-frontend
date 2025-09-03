@@ -6,6 +6,7 @@ import { userAtom } from "@/store/showStore";
 import { toast } from "sonner";
 import { getUserBookings } from "@/api/bookingApi";
 import { useRouter } from "next/navigation";
+import { AlertDemo } from "@/components/Error";
 
 interface Booking {
   id: number;
@@ -52,7 +53,10 @@ interface Booking {
   }, [user?.id]);
 
   if (!user?.id) {
-    return <p className="text-center mt-10">Login to see your bookings.</p>;
+    return 
+    <div className="flex justify-start md:justify-center items-center min-h-screen ">
+        <AlertDemo content={`Login to see your bookings.`} />
+      </div>;
   }
 
   if (loading)
@@ -63,7 +67,10 @@ interface Booking {
       <h1 className="text-3xl font-bold mb-8 text-center">🎟 My Tickets</h1>
 
       {bookings.length === 0 ? (
-        <p className="text-center">No bookings found.</p>
+        <div className="flex justify-start md:justify-center items-center min-h-screen ">
+        <AlertDemo content={`No bookings found`} />
+      </div>
+      
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {bookings.map((booking) => (

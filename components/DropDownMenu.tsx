@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import Cookies from "js-cookie";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,13 +11,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  SignUpButton,
   SignedIn,
-  SignedOut,
   UserButton,
 } from '@clerk/nextjs'
-import { useAtom } from "jotai";
-import { userAtom } from "@/store/showStore";
+import { useAtom, useSetAtom } from "jotai";
+import {  userAtom, setUserAtom } from "@/store/showStore";
 import { Menu } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useClerk } from "@clerk/nextjs";
@@ -24,6 +23,8 @@ import { toast } from "sonner";
 
 export function DropdownMenuDemo() {
   const [user] = useAtom(userAtom);
+  const setUser=useSetAtom(setUserAtom);
+
   const router = useRouter();
   const { signOut } = useClerk();
 
@@ -79,6 +80,8 @@ export function DropdownMenuDemo() {
             e.preventDefault(); // stop Radix from closing prematurely
             try {
               await signOut();
+              setUser(null);
+              Cookies.set("auth_token", "");
               toast.success("Logout successfully");
               setTimeout(() => router.push("/"), 500);
             } catch (err) {

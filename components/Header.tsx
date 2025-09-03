@@ -3,22 +3,23 @@
 import { useState, useEffect } from "react";
 import { Input } from "./ui/input"
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 import {
-    SignUpButton,
-    SignedIn,
-    SignedOut,
-    UserButton,
+    useClerk,
   } from '@clerk/nextjs'
-import { ClerkWatcher } from "@/components/ClerkWatcher";
 import { DropdownMenuDemo } from "./DropDownMenu";
 import { Search } from "lucide-react";
-import { useTheme } from "next-themes";
 import { ThemeSwitch } from "./theme-provider";
+import { toast } from "sonner";
+import { useAtom, useSetAtom } from "jotai";
+import { setUserAtom, userAtom } from "@/store/showStore";
 
 export const Header = ()=>{
     const router=useRouter();
-    const { theme, setTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
+    const [user] = useAtom(userAtom);
+    const setUser=useSetAtom(setUserAtom);
+    const { signOut } = useClerk();
 
     useEffect(() => setMounted(true), []);
 
@@ -52,18 +53,39 @@ export const Header = ()=>{
 
         {/* Right: Auth + Menu */}
         <div className="flex items-center gap-4">
-          <ClerkWatcher />
+        {user ? 
+        <button
+          onClick={async (e) => {
+            e.preventDefault(); 
+            try {
+              await signOut();
+              setUser(null);
+              Cookies.set("auth_token", "");
+              toast.success("Logout successfully");
+              setTimeout(() => router.push("/"), 500);
+            } catch (err) {
+              toast.error("Logout Failed");
+            }
+          }}
+          className="text-red-500  cursor-pointer"
+        >
+          Log out
+        </button>
 
-          <SignedOut>
-            <SignUpButton>
-              <button className="cursor-pointer">
-                Login
-              </button>
-            </SignUpButton>
-          </SignedOut>
-          <SignedIn>
-            <UserButton afterSignOutUrl="/" />
-          </SignedIn>
+          : <div
+          onClick={async (e) => {
+            e.preventDefault();
+            try {
+              router.push("/auth/sign-in"); 
+            } catch (err) {
+              toast.error("Redirect Failed");
+            }
+          }}
+          className="text-green-500  cursor-pointer"
+        >
+          Sign In
+        </div>}
+
            <ThemeSwitch />
           <DropdownMenuDemo />
 

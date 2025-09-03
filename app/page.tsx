@@ -8,6 +8,7 @@ import { getAllMovies } from "@/api/movieApi";
 import { useRouter } from "next/navigation";
 import { SkeletonCard } from "@/components/SkeletonCard";
 import { AlertDemo } from "@/components/Error";
+import { checkAuth } from "@/api/auth";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -24,7 +25,9 @@ export default function Home() {
   const [movies, setMovies] = useState<Movie[]>([]);
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
-
+  useEffect(() => {
+    checkAuth();
+  }, []);
   useEffect(() => {
     const fetchMovies = async () => {
       try {
@@ -54,6 +57,33 @@ export default function Home() {
             <CarouselBox />
           </div>
         </section>
+        <main className="flex items-center justify-around h-80 w-full  p-6 ">
+          <div className="flex flex-col sm:flex-row gap-6 w-full max-w-2xl justify-center sm:justify-around">
+            {/* Book Show */}
+            <div
+              onClick={() => {
+                router.push("/shows");
+              }}
+              className="flex items-center justify-center bg-pink-600 text-white font-semibold rounded-2xl shadow-md border-2 border-pink-600 
+                 h-14 sm:h-20 w-full sm:w-1/2 cursor-pointer 
+                 transition-transform transform hover:scale-105 hover:bg-pink-700"
+            >
+              Book Show
+            </div>
+
+            {/* View Tickets */}
+            <div
+              onClick={() => {
+                router.push("/booking");
+              }}
+              className="flex items-center justify-center bg-pink-600 text-white font-semibold rounded-2xl shadow-md border-2 border-pink-600 
+                 h-14 sm:h-20 w-full sm:w-1/2 cursor-pointer 
+                 transition-transform transform hover:scale-105 hover:bg-pink-700"
+            >
+              View Tickets
+            </div>
+          </div>
+        </main>
 
         {/* Recommended Movies */}
         <section aria-labelledby="recommended-heading" className="mb-16">
@@ -68,21 +98,19 @@ export default function Home() {
             <div className="flex justify-around items-center py-10">
               <SkeletonCard /> <SkeletonCard /> <SkeletonCard />
             </div>
-          ) : (
-            
-              movies.length > 0 ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
-                    {movies.map((movie, ind) => (
+          ) : movies.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
+              {movies.map((movie, ind) => (
+                <div
+                  key={ind}
+                  className="rounded-lg shadow hover:shadow-lg transition overflow-hidden bg-white dark:bg-gray-800"
+                  onClick={() => {
+                    router.push("/shows");
+                  }}
+                >
+                  {/* Colorful placeholder */}
                   <div
-                    key={ind}
-                    className="rounded-lg shadow hover:shadow-lg transition overflow-hidden bg-white dark:bg-gray-800"
-                    onClick={() => {
-                      router.push("/shows");
-                    }}
-                  >
-                    {/* Colorful placeholder */}
-                    <div
-                      className={`aspect-[2/3] flex items-center justify-center text-white text-lg font-bold
+                    className={`aspect-[2/3] flex items-center justify-center text-white text-lg font-bold
           ${
             [
               "bg-gradient-to-tr from-pink-500 to-yellow-500",
@@ -92,39 +120,37 @@ export default function Home() {
               "bg-gradient-to-tr from-indigo-400 to-cyan-500",
             ][ind % 5]
           }`}
-                    >
-                      {movie.title.charAt(0)}
-                    </div>
-
-                    <div className="p-2 sm:p-3">
-                      <div className="flex justify-center items-center">
-                        <h3 className="text-xs sm:text-sm font-medium truncate">
-                          {movie.title}
-                        </h3>
-                      </div>
-
-                      <div className="flex justify-around items-center">
-                        <h2 className="text-[10px] sm:text-xs text-purple-300">
-                          {movie.genre}
-                        </h2>
-                        <p className="text-xs sm:text-sm text-purple-300">
-                          {Math.floor(movie.duration / 60)}h{" "}
-                          {movie.duration % 60}m
-                        </p>
-                      </div>
-                    </div>
+                  >
+                    {movie.title.charAt(0)}
                   </div>
-                  
-                ))}
-                </div>
-              ) : (
-                <div className="flex justify-center items-center  p-2">
-                  <div>
-                    <AlertDemo content="No movies available" />
+
+                  <div className="p-2 sm:p-3">
+                    <div className="flex justify-center items-center">
+                      <h3 className="text-xs sm:text-sm font-medium truncate">
+                        {movie.title}
+                      </h3>
+                    </div>
+
+                    <div className="flex justify-around items-center">
+                      <h2 className="text-[10px] sm:text-xs text-purple-300">
+                        {movie.genre}
+                      </h2>
+                      <p className="text-xs sm:text-sm text-purple-300">
+                        {Math.floor(movie.duration / 60)}h {movie.duration % 60}
+                        m
+                      </p>
+                    </div>
                   </div>
                 </div>
               ))}
-          
+            </div>
+          ) : (
+            <div className="flex justify-center items-center  p-2">
+              <div>
+                <AlertDemo content="No movies available" />
+              </div>
+            </div>
+          )}
         </section>
       </main>
 

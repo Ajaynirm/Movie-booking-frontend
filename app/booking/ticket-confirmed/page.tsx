@@ -1,11 +1,10 @@
-'use client';
+"use client";
 
-
-import React, { useEffect, useState } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
-import { getBooking } from '@/api/bookingApi';
-import { SkeletonCard } from '@/components/SkeletonCard';
-import { AlertDemo } from '@/components/Error';
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { getBooking } from "@/api/bookingApi";
+import { SkeletonCard } from "@/components/SkeletonCard";
+import { AlertDemo } from "@/components/Error";
 
 interface Booking {
   id: number;
@@ -21,23 +20,23 @@ interface Booking {
   bookingTime: string;
 }
 
-const  TicketPage =async ({
+const TicketPage = ({
   searchParams,
 }: {
-  searchParams: Promise<{ [key: string]: string  | undefined }>
-}) =>{
-  
+  searchParams: { [key: string]: string | undefined };
+}) => {
   const router = useRouter();
   const [booking, setBooking] = useState<Booking | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const {bookingId} = await searchParams;
-  
+  const [error, setError] = useState("");
+
+  // ✅ unwrap searchParams properly
+  const { bookingId } = React.use(searchParams);
 
   useEffect(() => {
     if (!bookingId) return;
 
-    let isMounted = true; 
+    let isMounted = true;
 
     const fetchBooking = async () => {
       try {
@@ -45,7 +44,7 @@ const  TicketPage =async ({
         const data = await getBooking(parseInt(bookingId, 10));
         if (isMounted) setBooking(data);
       } catch (err) {
-        setError('Failed to fetch booking details');
+        setError("Failed to fetch booking details");
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -69,14 +68,14 @@ const  TicketPage =async ({
   if (error || !booking) {
     return (
       <div className="flex justify-start md:justify-center items-center min-h-screen ">
-        <AlertDemo content={`'No booking found'`} />
+        <AlertDemo content={`No booking found`} />
       </div>
     );
   }
 
   return (
-    <div className="flex justify-center items-center min-h-screen  p-4">
-      <div className=" shadow-lg rounded-2xl p-6 w-full max-w-md border border-gray-300">
+    <div className="flex justify-center items-center min-h-screen p-4">
+      <div className="shadow-lg rounded-2xl p-6 w-full max-w-md border border-gray-300">
         <h1 className="text-2xl font-bold text-center mb-4 ">
           🎟️ Booking Confirmed!
         </h1>
@@ -92,18 +91,16 @@ const  TicketPage =async ({
           <p className="text-lg font-semibold">{booking.movieName}</p>
 
           <p className="text-sm text-gray-500">Theatre</p>
-          <p className="text-lg font-semibold">
-            {booking.theatreName}
-          </p>
+          <p className="text-lg font-semibold">{booking.theatreName}</p>
 
           <p className="text-sm text-gray-500">Show Time</p>
           <p className="text-lg font-semibold">
-            {new Date(booking.showTime).toLocaleString('en-US', {
-              weekday: 'short',
-              day: 'numeric',
-              month: 'short',
-              hour: 'numeric',
-              minute: 'numeric',
+            {new Date(booking.showTime).toLocaleString("en-US", {
+              weekday: "short",
+              day: "numeric",
+              month: "short",
+              hour: "numeric",
+              minute: "numeric",
               hour12: true,
             })}
           </p>
@@ -112,12 +109,14 @@ const  TicketPage =async ({
           <p className="text-lg font-semibold">{booking.seatLabel}</p>
 
           <p className="text-sm text-gray-500">Price</p>
-          <p className="text-lg font-semibold text-green-600">₹{booking.price}</p>
+          <p className="text-lg font-semibold text-green-600">
+            ₹{booking.price}
+          </p>
         </div>
 
         <div className="mt-4 text-center">
           <button
-            onClick={() => router.push('/')}
+            onClick={() => router.push("/")}
             className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition"
           >
             Back to Home
@@ -126,6 +125,6 @@ const  TicketPage =async ({
       </div>
     </div>
   );
-}
+};
 
 export default TicketPage;

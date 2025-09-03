@@ -121,7 +121,7 @@ const groupedSeats = groupSeatsByRow(seats);
 
             <div className="lg:text-2xl">{show.movieTitle}</div>
 
-            <div className="flex justify-center items-center border-2 rounded-sm text-green-500 border-gray-300 lg:h-10 lg:w-30">
+            <div className="flex justify-center items-center border-2 rounded-sm text-green-500  p-2 lg:h-10 lg:w-30">
               {new Date(show.showTime).toLocaleString("en-US", {
                 hour: "numeric",
                 minute: "numeric",
@@ -170,56 +170,56 @@ const groupedSeats = groupSeatsByRow(seats);
           </div>
         </div> */}
 
-<div className="flex flex-col flex-wrap justify-center items-center gap-y-10 pt-36 pb-28">
-<TransformWrapper
-  initialScale={0.3}
-  minScale={0.6}
-  maxScale={4}
-  centerOnInit
-  wheel={{ step: 0.2 }}
-  pinch={{ step: 5 }}
- 
->
-  <TransformComponent
-    wrapperClass="w-full h-[70vh] border rounded-lg flex justify-center items-center"
-    contentClass="flex flex-col gap-4"
+
+<div className="flex flex-col flex-wrap justify-start items-center gap-y-10 pt-2 pb-2 ">
+  <TransformWrapper
+    initialScale={0.8}   // 👈 start smaller (40% of normal size)
+    minScale={0.4}       // 👈 lock min zoom
+    maxScale={0.4}       // 👈 lock max zoom
+    centerOnInit
+    panning={{ disabled: true }} // 👈 disable dragging
+    wheel={{ disabled: true }}   // 👈 disable mouse zoom
+    pinch={{ disabled: true }}   // 👈 disable pinch zoom
   >
-    <div className="flex flex-col gap-3">
-      {Object.entries(groupedSeats).map(([row, rowSeats]) => (
-        <div key={row} className="flex items-center gap-4">
-          {/* Row Label (e.g. A, B, C) */}
-          <div className="w-6 text-right font-bold">{row}</div>
-
-          {/* Row Seats */}
-          <div className="flex gap-2">
-            {rowSeats.map((seat) => (
-              <div
-                key={seat.seatLabel}
-                onClick={() => !seat.booked && setSelectedSeat(seat)}
-              >
-                <Seat
-                  id={seat.id}
-                  booked={seat.booked}
-                  seatLabel={seat.seatLabel}
-                  isSelected={selectedSeat?.id === seat.id}
-                />
-              </div>
-            ))}
+    <TransformComponent
+      wrapperClass="w-full  flex flex-wrap justify-start items-center border rounded-lg "
+      contentClass="flex flex-wrap flex-col justify-center items-start gap-2 "
+    >
+      <div className="flex flex-wrap flex-col gap-3">
+        {Object.entries(groupedSeats).map(([row, rowSeats]) => (
+          <div key={row} className="flex flex-wrap items-start gap-1">
+            <div className="w-6 text-right font-bold">{row}</div>
+            <div className="flex flex-wrap gap-2">
+              {rowSeats.map((seat) => (
+                <div
+                  key={seat.seatLabel}
+                  onClick={() => !seat.booked && setSelectedSeat(seat)}
+                >
+                  <Seat
+                    id={seat.id}
+                    booked={seat.booked}
+                    seatLabel={seat.seatLabel}
+                    isSelected={selectedSeat?.id === seat.id}
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="w-6 font-bold">{row}</div>
           </div>
-
-          {/* Row Label on right too (for symmetry) */}
-          <div className="w-6 font-bold">{row}</div>
-        </div>
-      ))}
-    </div>
-  </TransformComponent>
-</TransformWrapper>
-
-
-  <div className="flex justify-center items-center text-xl w-80 lg:w-120 border-2 rounded-lg bg-blue-400 mb-20">
+        ))}
+        
+      </div>
+      
+    </TransformComponent>
+    <div className="flex justify-center items-center text-xl w-80 lg:w-120 border-2 rounded-lg bg-blue-400 mb-40">
     screen
   </div>
+  </TransformWrapper>
+
+ 
 </div>
+
+
 
 
 
